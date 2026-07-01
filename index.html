@@ -6,10 +6,10 @@
     <title>Aitebot | 爱特沃智能机器人</title>
     <!-- 引入Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入Font Awesome图标 -->
+    <!-- 引入Font Awesome图标（国内CDN镜像） -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"
+      href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     />
     <!-- 自定义Tailwind配置 -->
     <script>
@@ -34,6 +34,18 @@
         }
         .nav-scrolled {
           @apply bg-white shadow-md;
+        }
+        .gradient-hero-1 {
+          background: linear-gradient(135deg, #ff5a00 0%, #ff8a00 50%, #ffb347 100%);
+        }
+        .gradient-hero-2 {
+          background: linear-gradient(135deg, #141e30 0%, #243b55 100%);
+        }
+        .gradient-hero-3 {
+          background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        }
+        .gradient-card {
+          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
       }
     </style>
@@ -78,6 +90,8 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         min-width: 160px;
         z-index: 100;
+        border-radius: 4px;
+        overflow: hidden;
       }
 
       .submenu li {
@@ -135,6 +149,7 @@
         text-align: center;
         color: white;
         z-index: 10;
+        width: 90%;
       }
 
       .carousel-btn {
@@ -148,6 +163,17 @@
         font-size: 24px;
         cursor: pointer;
         z-index: 10;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.3s ease;
+      }
+
+      .carousel-btn:hover {
+        background: rgba(0, 0, 0, 0.7);
       }
 
       .prev-btn {
@@ -156,6 +182,32 @@
 
       .next-btn {
         right: 20px;
+      }
+
+      /* 轮播指示器 */
+      .carousel-dots {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 10;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .dot.active {
+        background: white;
+        width: 30px;
+        border-radius: 5px;
       }
 
       /* 卡片悬停效果 */
@@ -188,10 +240,23 @@
         cursor: pointer;
         z-index: 1000;
         transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(255, 90, 0, 0.3);
       }
 
       #topBtn:hover {
         background-color: #e65100;
+        transform: translateY(-2px);
+      }
+
+      /* 图片加载失败占位 */
+      .img-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(0, 0, 0, 0.2);
+        font-size: 3rem;
       }
     </style>
   </head>
@@ -205,7 +270,7 @@
         class="container mx-auto px-6 py-4 flex items-center justify-between"
       >
         <!-- Logo -->
-        <a href="#" class="text-2xl font-bold text-white">
+        <a href="#" class="logo text-2xl font-bold text-white">
           <span class="text-primary">Aite</span>bot
         </a>
 
@@ -305,28 +370,31 @@
     <!-- 英雄区（自动轮播图） -->
     <section class="hero-carousel">
       <!-- 轮播图1 -->
-      <div class="slide active">
+      <div class="slide active gradient-hero-1">
         <img
           src="https://picsum.photos/1920/1080?robot1"
           alt="爱特沃智能机器人"
+          onerror="this.style.display='none'"
         />
         <div class="carousel-overlay"></div>
       </div>
 
       <!-- 轮播图2 -->
-      <div class="slide">
+      <div class="slide gradient-hero-2">
         <img
           src="https://picsum.photos/1920/1080?construction"
           alt="筑墙智匠建筑机器人"
+          onerror="this.style.display='none'"
         />
         <div class="carousel-overlay"></div>
       </div>
 
       <!-- 轮播图3 -->
-      <div class="slide">
+      <div class="slide gradient-hero-3">
         <img
           src="https://picsum.photos/1920/1080?ai"
           alt="人工智能与具身智能"
+          onerror="this.style.display='none'"
         />
         <div class="carousel-overlay"></div>
       </div>
@@ -351,11 +419,18 @@
 
       <!-- 轮播控制按钮 -->
       <button class="carousel-btn prev-btn" onclick="prevSlide()">
-        &#10094;
+        <i class="fa fa-chevron-left"></i>
       </button>
       <button class="carousel-btn next-btn" onclick="nextSlide()">
-        &#10095;
+        <i class="fa fa-chevron-right"></i>
       </button>
+
+      <!-- 轮播指示器 -->
+      <div class="carousel-dots">
+        <div class="dot active" onclick="goToSlide(0)"></div>
+        <div class="dot" onclick="goToSlide(1)"></div>
+        <div class="dot" onclick="goToSlide(2)"></div>
+      </div>
     </section>
 
     <!-- 关于我们 -->
@@ -418,7 +493,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <!-- 工业级 -->
-          <div class="bg-white p-8 rounded-lg shadow-md">
+          <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition-shadow">
             <div
               class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-6"
             >
@@ -431,7 +506,7 @@
           </div>
 
           <!-- 科研级 -->
-          <div class="bg-white p-8 rounded-lg shadow-md">
+          <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition-shadow">
             <div
               class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-6"
             >
@@ -444,7 +519,7 @@
           </div>
 
           <!-- 热度与技术积累级 -->
-          <div class="bg-white p-8 rounded-lg shadow-md">
+          <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition-shadow">
             <div
               class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-6"
             >
@@ -457,7 +532,7 @@
           </div>
 
           <!-- 技术转化级 -->
-          <div class="bg-white p-8 rounded-lg shadow-md">
+          <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition-shadow">
             <div
               class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-6"
             >
@@ -482,12 +557,16 @@
           <div
             class="project-card bg-white rounded-lg overflow-hidden shadow-md"
           >
-            <div class="h-64 bg-gray-200">
+            <div class="h-64 gradient-card">
               <img
                 src="https://picsum.photos/600/400?construction"
                 alt="筑墙智匠"
                 class="w-full h-full object-cover"
+                onerror="this.style.display='none'"
               />
+              <div class="img-placeholder">
+                <i class="fa fa-building"></i>
+              </div>
             </div>
             <div class="p-6">
               <span
@@ -508,12 +587,16 @@
           <div
             class="project-card bg-white rounded-lg overflow-hidden shadow-md"
           >
-            <div class="h-64 bg-gray-200">
+            <div class="h-64 gradient-card">
               <img
                 src="https://picsum.photos/600/400?robot"
                 alt="Mr.handy"
                 class="w-full h-full object-cover"
+                onerror="this.style.display='none'"
               />
+              <div class="img-placeholder">
+                <i class="fa fa-android"></i>
+              </div>
             </div>
             <div class="p-6">
               <span
@@ -534,12 +617,16 @@
           <div
             class="project-card bg-white rounded-lg overflow-hidden shadow-md"
           >
-            <div class="h-64 bg-gray-200">
+            <div class="h-64 gradient-card">
               <img
                 src="https://picsum.photos/600/400?data"
                 alt="Aapex数据采集"
                 class="w-full h-full object-cover"
+                onerror="this.style.display='none'"
               />
+              <div class="img-placeholder">
+                <i class="fa fa-database"></i>
+              </div>
             </div>
             <div class="p-6">
               <span
@@ -560,12 +647,16 @@
           <div
             class="project-card bg-white rounded-lg overflow-hidden shadow-md"
           >
-            <div class="h-64 bg-gray-200">
+            <div class="h-64 gradient-card">
               <img
                 src="https://picsum.photos/600/400?cat"
                 alt="猫卡努"
                 class="w-full h-full object-cover"
+                onerror="this.style.display='none'"
               />
+              <div class="img-placeholder">
+                <i class="fa fa-paw"></i>
+              </div>
             </div>
             <div class="p-6">
               <span
@@ -586,12 +677,16 @@
           <div
             class="project-card bg-white rounded-lg overflow-hidden shadow-md"
           >
-            <div class="h-64 bg-gray-200">
+            <div class="h-64 gradient-card">
               <img
                 src="https://picsum.photos/600/400?library"
                 alt="智能图书管理机器人"
                 class="w-full h-full object-cover"
+                onerror="this.style.display='none'"
               />
+              <div class="img-placeholder">
+                <i class="fa fa-book"></i>
+              </div>
             </div>
             <div class="p-6">
               <span
@@ -612,12 +707,16 @@
           <div
             class="project-card bg-white rounded-lg overflow-hidden shadow-md"
           >
-            <div class="h-64 bg-gray-200">
+            <div class="h-64 gradient-card">
               <img
                 src="https://picsum.photos/600/400?laundry"
                 alt="洗衣机器手"
                 class="w-full h-full object-cover"
+                onerror="this.style.display='none'"
               />
+              <div class="img-placeholder">
+                <i class="fa fa-tint"></i>
+              </div>
             </div>
             <div class="p-6">
               <span
@@ -707,7 +806,7 @@
           <div class="bg-white p-8 rounded-lg shadow-md">
             <h3 class="text-2xl font-bold mb-6">我们的使命</h3>
             <blockquote
-              class="text-lg text-gray-700 italic border-l-4 border-primary pl-4"
+              class="text-lg text-gray-700 italic border-l-4 border-primary pl-4 leading-relaxed"
             >
               "基于高校平台快速产品迭代研发，链接企业资源走向市场完成商业闭环，打造中国硬科技创新创业的生力军。"
             </blockquote>
@@ -723,29 +822,29 @@
 
         <div class="grid grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           <div
-            class="h-24 bg-gray-100 rounded flex items-center justify-center"
+            class="h-24 bg-gray-100 rounded flex items-center justify-center hover:bg-gray-200 transition-colors"
           >
-            <span class="text-gray-500">武汉理工大学</span>
+            <span class="text-gray-500 font-medium">武汉理工大学</span>
           </div>
           <div
-            class="h-24 bg-gray-100 rounded flex items-center justify-center"
+            class="h-24 bg-gray-100 rounded flex items-center justify-center hover:bg-gray-200 transition-colors"
           >
-            <span class="text-gray-500">中建三局科创</span>
+            <span class="text-gray-500 font-medium">中建三局科创</span>
           </div>
           <div
-            class="h-24 bg-gray-100 rounded flex items-center justify-center"
+            class="h-24 bg-gray-100 rounded flex items-center justify-center hover:bg-gray-200 transition-colors"
           >
-            <span class="text-gray-500">深研studio</span>
+            <span class="text-gray-500 font-medium">深研studio</span>
           </div>
           <div
-            class="h-24 bg-gray-100 rounded flex items-center justify-center"
+            class="h-24 bg-gray-100 rounded flex items-center justify-center hover:bg-gray-200 transition-colors"
           >
-            <span class="text-gray-500">苏州仁帮集团</span>
+            <span class="text-gray-500 font-medium">苏州仁帮集团</span>
           </div>
           <div
-            class="h-24 bg-gray-100 rounded flex items-center justify-center"
+            class="h-24 bg-gray-100 rounded flex items-center justify-center hover:bg-gray-200 transition-colors"
           >
-            <span class="text-gray-500">更多合作单位</span>
+            <span class="text-gray-500 font-medium">更多合作单位</span>
           </div>
         </div>
       </div>
@@ -758,13 +857,17 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <!-- 新闻卡片1 -->
-          <div class="bg-white rounded-lg overflow-hidden shadow-md">
-            <div class="h-48 bg-gray-200">
+          <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+            <div class="h-48 gradient-card">
               <img
                 src="https://picsum.photos/600/300?news1"
                 alt="新闻图片"
                 class="w-full h-full object-cover"
+                onerror="this.style.display='none'"
               />
+              <div class="img-placeholder text-2xl">
+                <i class="fa fa-newspaper-o"></i>
+              </div>
             </div>
             <div class="p-6">
               <p class="text-gray-500 text-sm mb-2">2026-04-08</p>
@@ -781,13 +884,17 @@
           </div>
 
           <!-- 新闻卡片2 -->
-          <div class="bg-white rounded-lg overflow-hidden shadow-md">
-            <div class="h-48 bg-gray-200">
+          <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+            <div class="h-48 gradient-card">
               <img
                 src="https://picsum.photos/600/300?news2"
                 alt="新闻图片"
                 class="w-full h-full object-cover"
+                onerror="this.style.display='none'"
               />
+              <div class="img-placeholder text-2xl">
+                <i class="fa fa-rocket"></i>
+              </div>
             </div>
             <div class="p-6">
               <p class="text-gray-500 text-sm mb-2">2026-04-01</p>
@@ -804,13 +911,17 @@
           </div>
 
           <!-- 新闻卡片3 -->
-          <div class="bg-white rounded-lg overflow-hidden shadow-md">
-            <div class="h-48 bg-gray-200">
+          <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+            <div class="h-48 gradient-card">
               <img
                 src="https://picsum.photos/600/300?news3"
                 alt="新闻图片"
                 class="w-full h-full object-cover"
+                onerror="this.style.display='none'"
               />
+              <div class="img-placeholder text-2xl">
+                <i class="fa fa-cogs"></i>
+              </div>
             </div>
             <div class="p-6">
               <p class="text-gray-500 text-sm mb-2">2025-11-30</p>
@@ -904,7 +1015,8 @@
                 <input
                   type="text"
                   id="name"
-                  class="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-primary"
+                  class="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
+                  placeholder="请输入您的姓名"
                 />
               </div>
               <div>
@@ -912,7 +1024,8 @@
                 <input
                   type="email"
                   id="email"
-                  class="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-primary"
+                  class="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
+                  placeholder="请输入您的邮箱"
                 />
               </div>
               <div>
@@ -922,12 +1035,13 @@
                 <textarea
                   id="message"
                   rows="4"
-                  class="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-primary"
+                  class="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors resize-none"
+                  placeholder="请输入您的留言内容"
                 ></textarea>
               </div>
               <button
                 type="submit"
-                class="bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded transition-colors"
+                class="bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded transition-colors w-full md:w-auto"
               >
                 发送消息
               </button>
@@ -957,7 +1071,7 @@
     </footer>
 
     <!-- 返回顶部按钮 -->
-    <button id="topBtn" onclick="scrollToTop()">
+    <button id="topBtn" onclick="scrollToTop()" aria-label="返回顶部">
       <i class="fa fa-chevron-up"></i>
     </button>
 
@@ -966,13 +1080,18 @@
       // 轮播图功能
       let slideIndex = 0;
       const slides = document.querySelectorAll(".slide");
+      const dots = document.querySelectorAll(".dot");
       const totalSlides = slides.length;
 
       // 显示指定幻灯片
       function showSlide(index) {
         slides.forEach((s, i) => {
           s.classList.remove("active");
-          if (i === index) s.classList.add("active");
+          dots[i].classList.remove("active");
+          if (i === index) {
+            s.classList.add("active");
+            dots[i].classList.add("active");
+          }
         });
       }
 
@@ -986,13 +1105,26 @@
         showSlide(slideIndex);
       }
 
+      function goToSlide(index) {
+        slideIndex = index;
+        showSlide(slideIndex);
+      }
+
       // 自动播放（5秒切换一次）
-      setInterval(nextSlide, 5000);
+      let carouselTimer = setInterval(nextSlide, 5000);
+
+      // 鼠标悬停暂停轮播
+      document.querySelector(".hero-carousel").addEventListener("mouseenter", () => {
+        clearInterval(carouselTimer);
+      });
+      document.querySelector(".hero-carousel").addEventListener("mouseleave", () => {
+        carouselTimer = setInterval(nextSlide, 5000);
+      });
 
       // 导航栏滚动效果
       window.addEventListener("scroll", function () {
         const navbar = document.getElementById("navbar");
-        const logo = navbar.querySelector(".logo a");
+        const logo = navbar.querySelector(".logo");
         const navLinks = navbar.querySelectorAll(".nav-item > a");
 
         if (window.scrollY > 50) {
@@ -1018,12 +1150,22 @@
       document.getElementById("menuBtn").addEventListener("click", function () {
         const mobileMenu = document.getElementById("mobileMenu");
         mobileMenu.classList.toggle("hidden");
+        const icon = this.querySelector("i");
+        if (mobileMenu.classList.contains("hidden")) {
+          icon.classList.remove("fa-times");
+          icon.classList.add("fa-bars");
+        } else {
+          icon.classList.remove("fa-bars");
+          icon.classList.add("fa-times");
+        }
       });
 
       // 点击移动端菜单链接后关闭菜单
       document.querySelectorAll("#mobileMenu a").forEach((link) => {
         link.addEventListener("click", function () {
           document.getElementById("mobileMenu").classList.add("hidden");
+          document.querySelector("#menuBtn i").classList.remove("fa-times");
+          document.querySelector("#menuBtn i").classList.add("fa-bars");
         });
       });
 
